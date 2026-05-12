@@ -46,6 +46,10 @@ forge script script/wire/SetEnforcedOptions.s.sol \
   --rpc-url $RPC_URL --broadcast
 
 # 5. SetRateLimits (multisig via Fireblocks)
+
+forge script script/wire/SetRateLimits.s.sol \
+  --rpc-url $RPC_URL --broadcast
+
 fireblocks-json-rpc --http -- forge script script/wire/SetRateLimits.s.sol \
   --sender $RATE_LIMITER_MANAGER_ADDRESS --slow --broadcast --unlocked --rpc-url {}
 

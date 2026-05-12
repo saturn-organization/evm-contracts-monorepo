@@ -2,32 +2,34 @@
 pragma solidity ^0.8.26;
 
 import {Script, console2} from "forge-std/Script.sol";
+import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol";
 import {IRateLimiter} from "@layerzerolabs/utils-evm-contracts/contracts/interfaces/IRateLimiter.sol";
 
 /**
- * Configures GLOBAL rate limits on the OFT/adapter with hardcoded defaults:
- *   20,000,000 tokens outbound / inbound, 1-day window, net accounting on.
+ * Configures GLOBAL rate limits on the OFT/adapter with hardcoded defaults.
  *
- * The script does two things, IN THIS ORDER:
- *   1. setRateLimitConfigs(id=0, ...) — configures the bucket
- *   2. setRateLimitGlobalConfig(useGlobalState=true) — activates global mode
+ * Pre-handoff pattern: the deployer (which still holds DEFAULT_ADMIN_ROLE) grants
+ * itself RATE_LIMITER_MANAGER_ROLE, configures the limits, then revokes the role.
  *
  * Required env vars:
+ *   DEPLOYER_PRIVATE_KEY    deployer key (must still hold DEFAULT_ADMIN_ROLE)
  *   OAPP_ADDRESS            deployed OFT/adapter proxy
  *
  * Optional env vars:
- *   TOKEN_DECIMALS          default 18 — scales the 20M token cap into wei
+ *   TOKEN_DECIMALS          default 18
  *
  * Run:
- *     fireblocks-json-rpc --http -- \
- *       forge script script/wire/SetRateLimits.s.sol \
- *       --sender $RATE_LIMITER_MANAGER_ADDRESS --slow --broadcast --unlocked --rpc-url {}
+ *   forge script script/wire/SetRateLimits.s.sol --rpc-url $RPC_URL --broadcast
  */
 contract SetRateLimits is Script {
+    bytes32 internal constant RATE_LIMITER_MANAGER_ROLE = keccak256("RATE_LIMITER_MANAGER_ROLE");
+
     uint256 internal constant LIMIT_TOKENS = 1_000_000;
     uint32 internal constant WINDOW = 3_600;
 
     function run() external {
+        uint256 deployerKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
+        address deployer = vm.addr(deployerKey);
         address oapp = vm.envAddress("OAPP_ADDRESS");
         uint8 tokenDecimals = uint8(vm.envOr("TOKEN_DECIMALS", uint256(18)));
         uint96 limit = uint96(LIMIT_TOKENS * 10 ** tokenDecimals);
@@ -48,12 +50,13 @@ contract SetRateLimits is Script {
             })
         });
 
-        vm.startBroadcast();
+        vm.startBroadcast(deployerKey);
+        IAccessControl(oapp).grantRole(RATE_LIMITER_MANAGER_ROLE, deployer);
         IRateLimiter(oapp).setRateLimitConfigs(params);
-        IRateLimiter(oapp)
-            .setRateLimitGlobalConfig(
-                IRateLimiter.RateLimitGlobalConfig({useGlobalState: true, isGloballyDisabled: false})
-            );
+        IRateLimiter(oapp).setRateLimitGlobalConfig(
+            IRateLimiter.RateLimitGlobalConfig({useGlobalState: true, isGloballyDisabled: false})
+        );
+        IAccessControl(oapp).revokeRole(RATE_LIMITER_MANAGER_ROLE, deployer);
         vm.stopBroadcast();
 
         console2.log("Global rate limit configured on:", oapp);
