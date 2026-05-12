@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# ============ Prompts ============
+
+read -p "Delay (hours): " delay_hours
+read -p "Proposer address: " proposer
+
+echo "Select chain:"
+echo "  1) ethereum"
+echo "  2) base"
+echo "  3) bnb"
+echo "  4) arbitrum"
+echo "  5) polygon"
+read -p "Chain: " chain_choice
+
+case $chain_choice in
+  1|ethereum)  chain="ethereum";  rpc_var="ETHEREUM_RPC_URL" ;;
+  2|base)      chain="base";      rpc_var="BASE_RPC_URL"     ;;
+  3|bnb)       chain="bnb";       rpc_var="BNB_RPC_URL"      ;;
+  4|arbitrum)  chain="arbitrum";  rpc_var="ARBITRUM_RPC_URL" ;;
+  5|polygon)   chain="polygon";   rpc_var="POLYGON_RPC_URL"  ;;
+  *) echo "Unknown chain: $chain_choice" >&2; exit 1 ;;
+esac
+
+rpc_url="${!rpc_var:-}"
+if [ -z "$rpc_url" ]; then
+  echo "Missing env var: $rpc_var" >&2
+  exit 1
+fi
+
+min_delay=$(( delay_hours * 3600 ))
+
+# ============ Summary ============
+
+echo ""
+echo "Chain:    $chain"
+echo "Delay:    $delay_hours hours ($min_delay seconds)"
+echo "Proposer: $proposer"
+echo "RPC:      $rpc_url"
+echo ""
+read -p "Deploy? (y/N) " confirm
+[[ "$confirm" =~ ^[Yy]$ ]] || exit 0
+
+# ============ Deploy ============
+
+MIN_DELAY=$min_delay \
+PROPOSER=$proposer \
+  forge script script/DeployTimelock.s.sol \
+    --rpc-url "$rpc_url" \
+    --broadcast \
+    --verify \
+    --etherscan-api-key "$SCANNER_API_KEY"

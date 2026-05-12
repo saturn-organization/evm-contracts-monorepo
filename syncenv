@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Usage: source ./syncenv <chain> <token>
+# Examples:
+#   source ./syncenv ethereum usdat
+#   source ./syncenv bnb susdat
+
+if ! (return 0 2>/dev/null); then
+  echo "syncenv must be sourced, not executed:" >&2
+  echo "  source ./syncenv <chain> <token>" >&2
+  exit 1
+fi
+
+if [ "$#" -lt 2 ]; then
+  echo "usage: source ./syncenv <chain> <token>" >&2
+  return 1
+fi
+
+_root=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+
+set -a
+# shellcheck disable=SC1090
+. "$_root/env/.env"
+. "$_root/env/$1/.env"
+. "$_root/env/$1/.env.$2"
+set +a
+
+
+export DEPLOYER_PRIVATE_KEY=$(op read "$DEPLOYER_PRIVATE_KEY_REF")
+export FIREBLOCKS_API_KEY=$(op read "$FIREBLOCKS_API_KEY_REF")
+export FIREBLOCKS_API_PRIVATE_KEY_PATH=$(op read "$FIREBLOCKS_PRIVATE_KEY_REF")
+
+unset _root
+echo "synced env for $1/$2"

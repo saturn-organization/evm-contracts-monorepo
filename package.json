@@ -1,0 +1,37 @@
+{
+  "name": "evm-oft-contracts",
+  "version": "1.0.0",
+  "description": "**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saturn-organization/evm-oft-contracts.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/saturn-organization/evm-oft-contracts/issues"
+  },
+  "homepage": "https://github.com/saturn-organization/evm-oft-contracts#readme",
+  "dependencies": {
+    "@layerzerolabs/lz-evm-messagelib-v2": "^3.0.168",
+    "@layerzerolabs/lz-evm-protocol-v2": "^3.0.168",
+    "@layerzerolabs/oapp-evm-contracts": "^0.2.84",
+    "@layerzerolabs/oapp-upgradeable-evm-contracts": "^0.2.84",
+    "@layerzerolabs/oft-evm-contracts": "^0.2.84",
+    "@layerzerolabs/oft-upgradeable-evm-contracts": "^0.2.84",
+    "@layerzerolabs/utils-evm-contracts": "^0.2.84",
+    "@layerzerolabs/utils-upgradeable-evm-contracts": "^0.2.84",
+    "@openzeppelin/contracts": "^5.6.1",
+    "@openzeppelin/contracts-upgradeable": "^5.6.1"
+  }
+}
