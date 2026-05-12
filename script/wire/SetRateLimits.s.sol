@@ -53,9 +53,10 @@ contract SetRateLimits is Script {
         vm.startBroadcast(deployerKey);
         IAccessControl(oapp).grantRole(RATE_LIMITER_MANAGER_ROLE, deployer);
         IRateLimiter(oapp).setRateLimitConfigs(params);
-        IRateLimiter(oapp).setRateLimitGlobalConfig(
-            IRateLimiter.RateLimitGlobalConfig({useGlobalState: true, isGloballyDisabled: false})
-        );
+        IRateLimiter(oapp)
+            .setRateLimitGlobalConfig(
+                IRateLimiter.RateLimitGlobalConfig({useGlobalState: true, isGloballyDisabled: false})
+            );
         IAccessControl(oapp).revokeRole(RATE_LIMITER_MANAGER_ROLE, deployer);
         vm.stopBroadcast();
 

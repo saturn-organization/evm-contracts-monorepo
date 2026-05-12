@@ -53,9 +53,7 @@ contract SetSendConfig is Script {
         address[] memory requiredDVNs = vm.envAddress("REQUIRED_DVNS", ",");
         address[] memory empty;
         address[] memory optionalDVNs = vm.envOr("OPTIONAL_DVNS", ",", empty);
-        uint8 optionalDVNThreshold = uint8(
-            vm.envOr("OPTIONAL_DVN_THRESHOLD", uint256(0))
-        );
+        uint8 optionalDVNThreshold = uint8(vm.envOr("OPTIONAL_DVN_THRESHOLD", uint256(0)));
 
         uint32 maxMessageSize = uint32(vm.envUint("MAX_MESSAGE_SIZE"));
         address executor = vm.envAddress("EXECUTOR");
@@ -68,22 +66,11 @@ contract SetSendConfig is Script {
             requiredDVNs: requiredDVNs,
             optionalDVNs: optionalDVNs
         });
-        ExecutorConfig memory exec = ExecutorConfig({
-            maxMessageSize: maxMessageSize,
-            executor: executor
-        });
+        ExecutorConfig memory exec = ExecutorConfig({maxMessageSize: maxMessageSize, executor: executor});
 
         SetConfigParam[] memory params = new SetConfigParam[](2);
-        params[0] = SetConfigParam({
-            eid: remoteEid,
-            configType: EXECUTOR_CONFIG_TYPE,
-            config: abi.encode(exec)
-        });
-        params[1] = SetConfigParam({
-            eid: remoteEid,
-            configType: ULN_CONFIG_TYPE,
-            config: abi.encode(uln)
-        });
+        params[0] = SetConfigParam({eid: remoteEid, configType: EXECUTOR_CONFIG_TYPE, config: abi.encode(exec)});
+        params[1] = SetConfigParam({eid: remoteEid, configType: ULN_CONFIG_TYPE, config: abi.encode(uln)});
 
         vm.startBroadcast(vm.envUint("DEPLOYER_PRIVATE_KEY"));
         ILayerZeroEndpointV2(endpoint).setConfig(oapp, sendLib, params);
