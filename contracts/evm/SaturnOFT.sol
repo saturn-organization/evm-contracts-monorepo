@@ -2,10 +2,16 @@
 pragma solidity ^0.8.26;
 
 import {IFundRecovery} from "@layerzerolabs/utils-evm-contracts/contracts/interfaces/IFundRecovery.sol";
-import {AllowlistRBACUpgradeable} from "@layerzerolabs/utils-upgradeable-evm-contracts/contracts/allowlist/AllowlistRBACUpgradeable.sol";
-import {PauseRBACUpgradeable} from "@layerzerolabs/utils-upgradeable-evm-contracts/contracts/pause/PauseRBACUpgradeable.sol";
+import {
+    AllowlistRBACUpgradeable
+} from "@layerzerolabs/utils-upgradeable-evm-contracts/contracts/allowlist/AllowlistRBACUpgradeable.sol";
+import {
+    PauseRBACUpgradeable
+} from "@layerzerolabs/utils-upgradeable-evm-contracts/contracts/pause/PauseRBACUpgradeable.sol";
 import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import {ERC20PermitUpgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
+import {
+    ERC20PermitUpgradeable
+} from "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {IERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -19,12 +25,7 @@ import {IERC20Plus} from "./interfaces/IERC20Plus.sol";
  *         Single implementation reused across Saturn stablecoins (USDat, sUSDat) — name/symbol set per proxy via initialize.
  * @dev Roles are handled through `AccessControl2StepUpgradeable`.
  */
-contract SaturnOFT is
-    IERC20Plus,
-    ERC20PermitUpgradeable,
-    AllowlistRBACUpgradeable,
-    PauseRBACUpgradeable
-{
+contract SaturnOFT is IERC20Plus, ERC20PermitUpgradeable, AllowlistRBACUpgradeable, PauseRBACUpgradeable {
     /// @dev Immutable decimals of the token.
     uint8 internal immutable DECIMALS;
 
@@ -50,11 +51,7 @@ contract SaturnOFT is
      * @param _symbol Symbol of the token
      * @param _initialAdmin Address to be granted `DEFAULT_ADMIN_ROLE`
      */
-    function initialize(
-        string calldata _name,
-        string calldata _symbol,
-        address _initialAdmin
-    ) public initializer {
+    function initialize(string calldata _name, string calldata _symbol, address _initialAdmin) public initializer {
         __ERC20_init(_name, _symbol);
         __ERC20Permit_init(_name);
         __AccessControl2Step_init(_initialAdmin);
@@ -68,10 +65,7 @@ contract SaturnOFT is
      * @param _amount Amount of tokens to mint
      * @return success Always returns true
      */
-    function mint(
-        address _to,
-        uint256 _amount
-    ) public virtual onlyRole(MINTER_ROLE) returns (bool success) {
+    function mint(address _to, uint256 _amount) public virtual onlyRole(MINTER_ROLE) returns (bool success) {
         _mint(_to, _amount);
         return true;
     }
@@ -82,10 +76,7 @@ contract SaturnOFT is
      * @param _amount Amount of tokens to burn
      * @return success Always returns true
      */
-    function burn(
-        address _from,
-        uint256 _amount
-    )
+    function burn(address _from, uint256 _amount)
         public
         virtual
         onlyRole(BURNER_ROLE)
@@ -103,13 +94,7 @@ contract SaturnOFT is
      * @dev Override to set immutable decimals.
      * @inheritdoc IERC20Metadata
      */
-    function decimals()
-        public
-        view
-        virtual
-        override(ERC20Upgradeable, IERC20Metadata)
-        returns (uint8 tokenDecimals)
-    {
+    function decimals() public view virtual override(ERC20Upgradeable, IERC20Metadata) returns (uint8 tokenDecimals) {
         return DECIMALS;
     }
 
@@ -117,10 +102,7 @@ contract SaturnOFT is
      * @dev Override to add allowlist checks.
      * @inheritdoc ERC20Upgradeable
      */
-    function transfer(
-        address _to,
-        uint256 _amount
-    )
+    function transfer(address _to, uint256 _amount)
         public
         virtual
         override(ERC20Upgradeable, IERC20)
@@ -136,11 +118,7 @@ contract SaturnOFT is
      * @dev Override to add allowlist checks.
      * @inheritdoc ERC20Upgradeable
      */
-    function transferFrom(
-        address _from,
-        address _to,
-        uint256 _amount
-    )
+    function transferFrom(address _from, address _to, uint256 _amount)
         public
         virtual
         override(ERC20Upgradeable, IERC20)
@@ -156,9 +134,7 @@ contract SaturnOFT is
     /**
      * @inheritdoc IERC20Permit
      */
-    function nonces(
-        address _owner
-    )
+    function nonces(address _owner)
         public
         view
         virtual
@@ -173,11 +149,7 @@ contract SaturnOFT is
     /**
      * @inheritdoc IFundRecovery
      */
-    function recoverFunds(
-        address _from,
-        address _to,
-        uint256 _amount
-    ) public virtual onlyRole(DEFAULT_ADMIN_ROLE) {
+    function recoverFunds(address _from, address _to, uint256 _amount) public virtual onlyRole(DEFAULT_ADMIN_ROLE) {
         if (isAllowlisted(_from)) revert CannotRecoverFromAllowlisted(_from);
         super._transfer(_from, _to, _amount);
     }

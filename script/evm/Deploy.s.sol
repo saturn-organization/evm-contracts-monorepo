@@ -51,25 +51,37 @@ contract Deploy is Script {
 
         // 1. Token impl + proxy
         address tokenImpl = address(new SaturnOFT(decimals));
-        address tokenProxy = CreateXLib.CREATEX.deployCreate3(
-            tokenSalt,
-            abi.encodePacked(
-                type(TransparentUpgradeableProxy).creationCode,
-                abi.encode(tokenImpl, defaultAdmin, abi.encodeCall(SaturnOFT.initialize, (tokenName, tokenSymbol, deployer)))
-            )
-        );
+        address tokenProxy = CreateXLib.CREATEX
+            .deployCreate3(
+                tokenSalt,
+                abi.encodePacked(
+                    type(TransparentUpgradeableProxy).creationCode,
+                    abi.encode(
+                        tokenImpl,
+                        defaultAdmin,
+                        abi.encodeCall(SaturnOFT.initialize, (tokenName, tokenSymbol, deployer))
+                    )
+                )
+            );
 
         // 2. OFT impl + proxy
         address oftImpl = address(
-            new SaturnOFTAdapter(tokenProxy, tokenProxy, endpoint, false, BURN_SELECTOR, MINT_SELECTOR, rateLimiterScaleDecimals)
-        );
-        address oftProxy = CreateXLib.CREATEX.deployCreate3(
-            oftSalt,
-            abi.encodePacked(
-                type(TransparentUpgradeableProxy).creationCode,
-                abi.encode(oftImpl, defaultAdmin, abi.encodeCall(OFTBurnMintExtendedRBACUpgradeable.initialize, (deployer, feeDeposit)))
+            new SaturnOFTAdapter(
+                tokenProxy, tokenProxy, endpoint, false, BURN_SELECTOR, MINT_SELECTOR, rateLimiterScaleDecimals
             )
         );
+        address oftProxy = CreateXLib.CREATEX
+            .deployCreate3(
+                oftSalt,
+                abi.encodePacked(
+                    type(TransparentUpgradeableProxy).creationCode,
+                    abi.encode(
+                        oftImpl,
+                        defaultAdmin,
+                        abi.encodeCall(OFTBurnMintExtendedRBACUpgradeable.initialize, (deployer, feeDeposit))
+                    )
+                )
+            );
 
         // 3. Grant the bridge mint/burn rights on the token
         IAccessControl(tokenProxy).grantRole(MINTER_ROLE, oftProxy);

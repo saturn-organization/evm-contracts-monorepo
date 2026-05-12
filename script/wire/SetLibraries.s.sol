@@ -33,12 +33,7 @@ contract SetLibraries is Script {
         vm.startBroadcast(vm.envUint("DEPLOYER_PRIVATE_KEY"));
 
         ILayerZeroEndpointV2(endpoint).setSendLibrary(oapp, remoteEid, sendLib);
-        ILayerZeroEndpointV2(endpoint).setReceiveLibrary(
-            oapp,
-            remoteEid,
-            receiveLib,
-            gracePeriod
-        );
+        ILayerZeroEndpointV2(endpoint).setReceiveLibrary(oapp, remoteEid, receiveLib, gracePeriod);
 
         vm.stopBroadcast();
 

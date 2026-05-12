@@ -19,9 +19,9 @@ import {IRateLimiter} from "@layerzerolabs/utils-evm-contracts/contracts/interfa
  *   TOKEN_DECIMALS          default 18 — scales the 20M token cap into wei
  *
  * Run:
-    fireblocks-json-rpc --http -- \
-      forge script script/wire/SetRateLimits.s.sol \
-      --sender $RATE_LIMITER_MANAGER_ADDRESS --slow --broadcast --unlocked --rpc-url {}
+ *     fireblocks-json-rpc --http -- \
+ *       forge script script/wire/SetRateLimits.s.sol \
+ *       --sender $RATE_LIMITER_MANAGER_ADDRESS --slow --broadcast --unlocked --rpc-url {}
  */
 contract SetRateLimits is Script {
     uint256 internal constant LIMIT_TOKENS = 1_000_000;
@@ -32,8 +32,7 @@ contract SetRateLimits is Script {
         uint8 tokenDecimals = uint8(vm.envOr("TOKEN_DECIMALS", uint256(18)));
         uint96 limit = uint96(LIMIT_TOKENS * 10 ** tokenDecimals);
 
-        IRateLimiter.SetRateLimitConfigParam[]
-            memory params = new IRateLimiter.SetRateLimitConfigParam[](1);
+        IRateLimiter.SetRateLimitConfigParam[] memory params = new IRateLimiter.SetRateLimitConfigParam[](1);
         params[0] = IRateLimiter.SetRateLimitConfigParam({
             id: 0,
             config: IRateLimiter.RateLimitConfig({
@@ -51,12 +50,10 @@ contract SetRateLimits is Script {
 
         vm.startBroadcast();
         IRateLimiter(oapp).setRateLimitConfigs(params);
-        IRateLimiter(oapp).setRateLimitGlobalConfig(
-            IRateLimiter.RateLimitGlobalConfig({
-                useGlobalState: true,
-                isGloballyDisabled: false
-            })
-        );
+        IRateLimiter(oapp)
+            .setRateLimitGlobalConfig(
+                IRateLimiter.RateLimitGlobalConfig({useGlobalState: true, isGloballyDisabled: false})
+            );
         vm.stopBroadcast();
 
         console2.log("Global rate limit configured on:", oapp);
