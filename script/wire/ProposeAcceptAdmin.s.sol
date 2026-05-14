@@ -40,9 +40,7 @@ contract ProposeAcceptAdmin is Script {
         bytes memory data = abi.encodeCall(AccessControl2StepUpgradeable.acceptDefaultAdminTransfer, ());
         TimelockController(payable(timelock)).schedule(target, 0, data, bytes32(0), bytes32(0), delay);
 
-        bytes32 opId = TimelockController(payable(timelock)).hashOperation(
-            target, 0, data, bytes32(0), bytes32(0)
-        );
+        bytes32 opId = TimelockController(payable(timelock)).hashOperation(target, 0, data, bytes32(0), bytes32(0));
         console2.log("Scheduled on timelock:", timelock);
         console2.log("Target:               ", target);
         console2.log("Operation ID:         ", uint256(opId));
