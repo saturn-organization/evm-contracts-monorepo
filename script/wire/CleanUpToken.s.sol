@@ -3,9 +3,7 @@ pragma solidity ^0.8.26;
 
 import {Script, console2} from "forge-std/Script.sol";
 import {IAccessControl} from "@openzeppelin/contracts/access/IAccessControl.sol";
-import {
-    IAccessControlEnumerable
-} from "@openzeppelin/contracts/access/extensions/IAccessControlEnumerable.sol";
+import {IAccessControlEnumerable} from "@openzeppelin/contracts/access/extensions/IAccessControlEnumerable.sol";
 
 /**
  * Revokes MINTER_ROLE and BURNER_ROLE from every current holder on the SaturnOFT token proxy.
@@ -43,8 +41,12 @@ contract CleanUpToken is Script {
         vm.stopBroadcast();
 
         console2.log("Token:                          ", token);
-        console2.log("Remaining MINTER_ROLE holders:  ", IAccessControlEnumerable(token).getRoleMemberCount(MINTER_ROLE));
-        console2.log("Remaining BURNER_ROLE holders:  ", IAccessControlEnumerable(token).getRoleMemberCount(BURNER_ROLE));
+        console2.log(
+            "Remaining MINTER_ROLE holders:  ", IAccessControlEnumerable(token).getRoleMemberCount(MINTER_ROLE)
+        );
+        console2.log(
+            "Remaining BURNER_ROLE holders:  ", IAccessControlEnumerable(token).getRoleMemberCount(BURNER_ROLE)
+        );
     }
 
     /// @dev Snapshot holders before mutating; revocations shift the enumerable set's indices.
