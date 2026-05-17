@@ -1,70 +1,25 @@
-## USDat BNB Config -- TODO complete admin transfer
+## USDat BNB Config
 Deployer:              0x59Ebb7143dDDd7b045dE7B0bd0F99446143F1624
 Predicted token proxy: 0x0Bb150DFa86EA5d7742F07FEfCD8E8edA81D64eF
-Predicted OFT proxy:   0xA347D34AA2c94784ab355B7c3c3304469Cd56524
 Token impl:  0x65458213Bb2398f968cA1760b806956966B9adAc
 Token proxy: 0x0Bb150DFa86EA5d7742F07FEfCD8E8edA81D64eF
-AdapterOFT impl:    0x9827C419eb1ef2798276842124a373Dc369754Ab
-AdapterOFT proxy:   0xA347D34AA2c94784ab355B7c3c3304469Cd56524
+Chainlink Adapter:   0x904939A965eDc2Efbd44Fd4db223f07680510C61
 
-## sUSDat BNB Config -- TODO complete admin transfer
+## sUSDat BNB Config
 Deployer:              0x59Ebb7143dDDd7b045dE7B0bd0F99446143F1624
 Predicted token proxy: 0x9cd57D3685E6868caCaA8BDCaAf52CBdEBf4fA25
-Predicted OFT proxy:   0xecD684Ec8416d17512172166724E5736c95b47cc
 Token impl:  0x5885f15E70BD20bF2FBa9382B03aeDB2608B3Ad2
 Token proxy: 0x9cd57D3685E6868caCaA8BDCaAf52CBdEBf4fA25
-AdapterOFT impl:    0x97974dAc5C287E03B12Da9410FebC0CcaBB033B1
-AdapterOFT proxy:   0xecD684Ec8416d17512172166724E5736c95b47cc
-
-## USDat Ethereum Config -- TODO complete admin transfer
-Deployer:         0x59Ebb7143dDDd7b045dE7B0bd0F99446143F1624
-Predicted proxy:  0xA347D34AA2c94784ab355B7c3c3304469Cd56524
-Implementation:  0x9eD7580F54207266972C1562813243A7dF575765
-AdapterProxy:           0xA347D34AA2c94784ab355B7c3c3304469Cd56524
-
-## sUSDat Ethereum Config -- TODO complete admin transfer
-Deployer:         0x59Ebb7143dDDd7b045dE7B0bd0F99446143F1624
-Predicted proxy:  0xecD684Ec8416d17512172166724E5736c95b47cc
-Implementation:  0x106E999f46C9F564FFD6E5b7feDCBAF23d3Eec8c
-AdapterProxy:           0xecD684Ec8416d17512172166724E5736c95b47cc
+Chainlink Adapter:   0xe2f5aEFf1C065Fac95e7F48ba854470d41B66B7c
 
 
-# 1. SetLibraries (deployer)
-forge script script/wire/SetLibraries.s.sol \
-  --rpc-url $RPC_URL --broadcast
-
-# 2. SetSendConfig (deployer)
-forge script script/wire/SetSendConfig.s.sol \
-  --rpc-url $RPC_URL --broadcast
-
-# 3. SetReceiveConfig (deployer)
-forge script script/wire/SetReceiveConfig.s.sol \
-  --rpc-url $RPC_URL --broadcast
-
-# 4. SetEnforcedOptions (deployer)
-forge script script/wire/SetEnforcedOptions.s.sol \
-  --rpc-url $RPC_URL --broadcast
-
-# 5. SetRateLimits (multisig via Fireblocks)
-
-forge script script/wire/SetRateLimits.s.sol \
-  --rpc-url $RPC_URL --broadcast
-
-fireblocks-json-rpc --http -- forge script script/wire/SetRateLimits.s.sol \
-  --sender $RATE_LIMITER_MANAGER_ADDRESS --slow --broadcast --unlocked --rpc-url {}
-
-# 6. SetPeers (deployer) — only after the OTHER chain (ethereum) is deployed
-forge script script/wire/SetPeers.s.sol \
-  --rpc-url $RPC_URL --broadcast
-
-
-# 7. Propose (multisig via Fireblocks)
+# 1. Propose (multisig via Fireblocks)
 fireblocks-json-rpc --http -- forge script script/wire/ProposeAcceptAdmin.s.sol \
   --sender $ADMIN_TIMELOCK_PROPOSER --slow --broadcast --unlocked --rpc-url {}
 
-# 8. Wait for timelock delay
+# 2. Wait for timelock delay
 
-# 9. Execute (deployer)
+# 3. Execute (deployer)
 forge script script/wire/ExecuteAcceptAdmin.s.sol --rpc-url $RPC_URL --broadcast
 
 
