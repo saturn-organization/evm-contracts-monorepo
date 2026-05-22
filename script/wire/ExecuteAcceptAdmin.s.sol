@@ -14,7 +14,6 @@ import {
  * Required env vars:
  *   DEPLOYER_PRIVATE_KEY    any funded EOA — execution is permissionless
  *   DEFAULT_ADMIN_ROLE      the timelock contract
- *   OAPP_ADDRESS            the adapter proxy (must match propose)
  *   TOKEN_ADDRESS           the token proxy (only required on BNB)
  *
  * Run:
@@ -28,10 +27,7 @@ contract ExecuteAcceptAdmin is Script {
         address timelock = vm.envAddress("DEFAULT_ADMIN_ROLE");
 
         vm.startBroadcast(deployerKey);
-        _execute(timelock, vm.envAddress("OAPP_ADDRESS"));
-        if (block.chainid == BNB_CHAIN_ID) {
-            _execute(timelock, vm.envAddress("TOKEN_ADDRESS"));
-        }
+        _execute(timelock, vm.envAddress("TOKEN_ADDRESS"));
         vm.stopBroadcast();
     }
 
